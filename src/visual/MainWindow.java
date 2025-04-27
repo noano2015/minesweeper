@@ -8,8 +8,9 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -43,8 +44,11 @@ public class MainWindow {
 
     private Grid _grid;
 
-
-    public MainWindow(){
+    /**
+     * Creates the main window of the program
+     * @throws IOException
+     */
+    public MainWindow() throws IOException{
 
         /* JFRAME CONFIGURATION */
 
@@ -78,10 +82,10 @@ public class MainWindow {
 
         /* JBUTTON CONFIGURATION */
 
-        _restartButton = new MainButton("Restart", new ImageIcon("images/restart.png"));
-        _easyButton = new MainButton("Easy", new ImageIcon("images/easy.png"));
-        _mediumButton = new MainButton("Medium", new ImageIcon("images/medium.png"));
-        _hardButton = new MainButton("Hard", new ImageIcon("images/hard.png"));
+        _restartButton = new MainButton("Restart", "images/restart.png");
+        _easyButton = new MainButton("Easy", "images/easy.png");
+        _mediumButton = new MainButton("Medium", "images/medium.png");
+        _hardButton = new MainButton("Hard", "images/hard.png");
 
         setupDifficultyButton(_restartButton.getButton(), "EASY");
         setupDifficultyButton(_easyButton.getButton(), "EASY");
@@ -97,9 +101,10 @@ public class MainWindow {
         // TITLE
         _title = new JLabel("Minesweeper");
         _title.setFont(_font);
-        ImageIcon image = new ImageIcon("images/shovel.png");
-        Image resizedImage = image.getImage().getScaledInstance(36, 36, Image.SCALE_SMOOTH);
-        image= new ImageIcon(resizedImage);
+        
+        BufferedImage imageStream = ResourceLoader.loadImage("images/shovel.png");
+        Image resizedImage = imageStream.getScaledInstance(36, 36, Image.SCALE_SMOOTH);
+        ImageIcon image= new ImageIcon(resizedImage);
         _title.setIconTextGap(10);
         _title.setHorizontalTextPosition(SwingConstants.LEFT);
         _title.setVerticalTextPosition(SwingConstants.CENTER);
@@ -111,8 +116,14 @@ public class MainWindow {
         // MINE COUNTER
         _mines = new JLabel();
         try{
-            _mineCounterFont = 
-            Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/digital_7/digital-7.ttf")).deriveFont(44f);
+            InputStream fontStream = getClass().getResourceAsStream("Fonts/digital_7/digital-7.ttf");
+            if(fontStream == null){
+                System.out.println("Font not found!");
+            }
+            else{
+                _mineCounterFont = 
+                Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(44f);
+            }
 
         }catch(IOException e){
             System.out.println("Failed to read the font.");
@@ -131,8 +142,9 @@ public class MainWindow {
             BorderFactory.createLineBorder(Color.BLACK, 4, true),
             BorderFactory.createEmptyBorder(10,10,10,10)
         ));
-        image = new ImageIcon("images/mine.png");
-        resizedImage = image.getImage().getScaledInstance(36, 36, Image.SCALE_SMOOTH);
+
+        imageStream = ResourceLoader.loadImage("images/mine.png");
+        resizedImage = imageStream.getScaledInstance(36, 36, Image.SCALE_SMOOTH);
         image= new ImageIcon(resizedImage);
 
         _mines.setIconTextGap(10);
@@ -156,7 +168,6 @@ public class MainWindow {
         _winningLabel.setIconTextGap(10);
         _winningLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
         _winningLabel.setVerticalTextPosition(SwingConstants.CENTER);
-        _winningLabel.setIcon(image);
 
         _title_panel.add(_winningLabel);
 
@@ -196,7 +207,12 @@ public class MainWindow {
                 _frame.remove(_main_panel);
                 _main_panel = new JPanel();
                 _main_panel.setBorder(BorderFactory.createEmptyBorder(2, 10, 10, 10));
-                _grid = new Grid(difficulty, _mines, _winningLabel);
+
+                try {
+                    _grid = new Grid(difficulty, _mines, _winningLabel);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
                 _main_panel.setLayout(new GridLayout(_grid.getGameSize(),_grid.getGameSize(),0,0));
 
 

@@ -1,4 +1,6 @@
 package visual;
+import java.io.IOException;
+
 import javax.swing.SwingUtilities;
 
 public class Launcher{
@@ -7,7 +9,12 @@ public class Launcher{
 
             @Override
             public void run() {
-                MainWindow mainWindow = new MainWindow();
+                MainWindow mainWindow = null;
+                try {
+                    mainWindow = new MainWindow();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 mainWindow.show();
             }
             

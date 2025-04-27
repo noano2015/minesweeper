@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -51,13 +53,28 @@ public class Cell {
         ));
 
         // Set disabledIcons
-        ImageIcon image;
-        if(_mines == Game.MINE) image = new ImageIcon("images/mine.png");
-        else  image = new ImageIcon("images/number-" + _mines + ".png");
+        BufferedImage image_buf = null;
+        if(_mines == 0) _cell.setIcon(null);
+        else{
+            if(_mines == Game.MINE){
+                try {
+                    image_buf = ResourceLoader.loadImage("images/mine.png");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else{
+                try {
+                    image_buf = ResourceLoader.loadImage("images/number-" + _mines + ".png");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            Image resizedImage = image_buf.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+           ImageIcon image= new ImageIcon(resizedImage);
+            _cell.setDisabledIcon(image);
+        }
 
-        Image resizedImage = image.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        image= new ImageIcon(resizedImage);
-        _cell.setDisabledIcon(image);
 
         // Add Mouse Listeners in order to play the game
         _cell.addMouseListener(new MouseListener() {
@@ -71,10 +88,14 @@ public class Cell {
                 if(SwingUtilities.isRightMouseButton(e) && 
                     _grid.getMines() != 0 && _cell.isEnabled()){
                     if(!_flagged){
-                        ImageIcon image;
-                        image = new ImageIcon("images/red-flag.png");
-                        Image resizedImage = image.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-                        image= new ImageIcon(resizedImage);
+                        BufferedImage image_buf = null;
+                        try {
+                            image_buf = ResourceLoader.loadImage("images/red-flag.png");
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                        Image resizedImage = image_buf.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+                        ImageIcon image= new ImageIcon(resizedImage);
                         _cell.setIcon(image);
                         _flagged = true;
                         _grid.setMines(_grid.getMines() - 1);
@@ -94,15 +115,27 @@ public class Cell {
                         for(Cell cell : surroundings)
                             if(cell.IsFlagged()) flaggedCells++;
                         
-                        if(flaggedCells == _mines)
+                        if(flaggedCells == _mines){
                             for(Cell cell : surroundings){
                                 if(!cell.IsFlagged() && cell.getJButton().isEnabled()){
                                     cell.seeCell();
-                                    _grid.updateGrid(cell.getLine(), cell.getColumn());
+
+                                    try {
+                                        _grid.updateGrid(cell.getLine(), cell.getColumn());
+                                    } catch (IOException e1) {
+                                        
+                                        e1.printStackTrace();
+                                    }
                                 }
-                                _grid.updateGrid(_line, _column);
+                                
                             }
-                        
+
+                            try {
+                                _grid.updateGrid(_line, _column);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
                         return;
                     }
                     
@@ -117,19 +150,34 @@ public class Cell {
                     if(_mines == 0);
                     else{
                     
-                        ImageIcon image;
-                        if(_mines == Game.MINE) image = new ImageIcon("images/mine.png");
+                        
+                        BufferedImage imageBuf = null;
+                        if(_mines == Game.MINE){ 
+                            try {
+                                imageBuf = ResourceLoader.loadImage("images/mine.png");
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
                         else{
                             if(_flagged) _grid.setMines(_grid.getMines() + 1);
-                            image =new ImageIcon("images/number-" + _mines + ".png");
+                            try {
+                                imageBuf = ResourceLoader.loadImage("images/number-" + _mines + ".png");
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
                         }
 
-                        Image resizedImage = image.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-                        image= new ImageIcon(resizedImage);
+                        Image resizedImage = imageBuf.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+                        ImageIcon image= new ImageIcon(resizedImage);
                         _cell.setIcon(image);
                     }
                     
-                    _grid.updateGrid(_line, _column);
+                    try {
+                        _grid.updateGrid(_line, _column);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
 
@@ -161,15 +209,28 @@ public class Cell {
         if(_mines == 0);
         else{
                     
-            ImageIcon image;
-            if(_mines == Game.MINE) image = new ImageIcon("images/mine.png");
-            else{
+            BufferedImage imageBuf = null;
+            if(_mines == Game.MINE){ 
+                try {
+                    imageBuf = ResourceLoader.loadImage("images/mine.png");
+                } catch (IOException e) {
+                   
+                    e.printStackTrace();
+                }
+                
+            }else{
                 if(_flagged) _grid.setMines(_grid.getMines() + 1);
-                image =new ImageIcon("images/number-" + _mines + ".png");
+                try {
+                    imageBuf = ResourceLoader.loadImage("images/number-" + _mines + ".png");
+                } catch (IOException e) {
+                    
+                    e.printStackTrace();
+                }
+                
             }
 
-            Image resizedImage = image.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-            image= new ImageIcon(resizedImage);
+            Image resizedImage = imageBuf.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+            ImageIcon image= new ImageIcon(resizedImage);
             _cell.setIcon(image);
         }
     }

@@ -8,6 +8,8 @@ import javax.swing.JLabel;
 import core.Game;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Grid {
@@ -24,8 +26,9 @@ public class Grid {
      * @param difficulty - difficulty of the game
      * @param mines - the JLabel that will show the counter with the mines
      * @param win - the JLabel that will show if the player won or lost
+     * @throws IOException 
      */
-    public Grid(String difficulty, JLabel mines, JLabel win){
+    public Grid(String difficulty, JLabel mines, JLabel win) throws IOException{
 
         _game = new Game(difficulty);
         int size = _game.getSize();
@@ -34,9 +37,9 @@ public class Grid {
         _mines.setText(Integer.toString(_game.getMines()));
         _win = win;
 
-        ImageIcon image = new ImageIcon("images/neutral.png");
-        Image resizedImage = image.getImage().getScaledInstance(36, 36, Image.SCALE_SMOOTH);
-        image= new ImageIcon(resizedImage);
+        BufferedImage imageStream = ResourceLoader.loadImage("images/neutral.png");
+        Image resizedImage = imageStream.getScaledInstance(36, 36, Image.SCALE_SMOOTH);
+        ImageIcon image= new ImageIcon(resizedImage);
         _win.setIcon(image);
         _win.setText("  ...");
 
@@ -83,14 +86,15 @@ public class Grid {
      * seen and if the player has won or lost the game
      * @param line - the line of the cell the player clicked
      * @param column - the column of the cell the player clicked
+     * @throws IOException 
      */
-    public void updateGrid(int line, int column){ 
+    public void updateGrid(int line, int column) throws IOException{ 
         
         List<List<Integer>> seenCells = _game.play(line, column);
         if(_game.getState() == Game.WON){
-            ImageIcon image = new ImageIcon("images/smile.png");
-            Image resizedImage = image.getImage().getScaledInstance(36, 36, Image.SCALE_SMOOTH);
-            image= new ImageIcon(resizedImage);
+            BufferedImage imageStream = ResourceLoader.loadImage("images/smile.png");
+            Image resizedImage = imageStream.getScaledInstance(36, 36, Image.SCALE_SMOOTH);
+            ImageIcon image= new ImageIcon(resizedImage);
             _win.setIcon(image);
             _win.setText("YOU WON");
 
@@ -101,9 +105,9 @@ public class Grid {
             return;
         }
         if(_game.getState() == Game.LOST){
-            ImageIcon image = new ImageIcon("images/dead.png");
-            Image resizedImage = image.getImage().getScaledInstance(36, 36, Image.SCALE_SMOOTH);
-            image= new ImageIcon(resizedImage);
+            BufferedImage imageStream = ResourceLoader.loadImage("images/dead.png");
+            Image resizedImage = imageStream.getScaledInstance(36, 36, Image.SCALE_SMOOTH);
+            ImageIcon image= new ImageIcon(resizedImage);
             _win.setIcon(image);
             _win.setText("YOU LOST");
 
